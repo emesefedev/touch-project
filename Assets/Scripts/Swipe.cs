@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
@@ -21,47 +19,35 @@ public class Swipe : MonoBehaviour
 
     private void Update()
     {
-        
-        if (Input.touchCount > 0)
+        if (Input.touchCount <= 0) return;
+
+        Touch touch = Input.GetTouch(0);
+
+        if(touch.phase != TouchPhase.Ended)
         {
-            Touch touch = Input.GetTouch(0);
-            Debug.Log("hola");
-            
-            if(touch.phase == TouchPhase.Began)
-            {
-                startSwipePosition = touch.position;
-            }
-
-            if (touch.phase == TouchPhase.Ended)
-            {
-                endSwipePosition = touch.position;
-
-                if (endSwipePosition.x < startSwipePosition.x)
-                {
-                    // Swipe from right to left
-                    UpdateCurrentNumber(1);
-                } 
-                else if (endSwipePosition.x > startSwipePosition.x)
-                {   
-                    // Swipe from left to right
-                    UpdateCurrentNumber(-1);
-                }
-            }
+            return;
         }
+
+        Vector2 deltaPos = touch.deltaPosition;
+
+        if (deltaPos.x > 0)
+        {
+            // Swipe from right to left
+            UpdateCurrentNumber(1);
+        }
+        else if (deltaPos.x < 0)
+        {
+            // Swipe from left to right
+            UpdateCurrentNumber(-1);
+        }
+
     }
 
     private void UpdateCurrentNumber(int amountToAdd)
     {
-        currentNumber += amountToAdd;
-        if (currentNumber > maxValue)
-        {
-            currentNumber = 0;
-        }
-        else if (currentNumber < minValue)
-        {
-            currentNumber = maxValue;
-        }
-
+        int newCurrentNumber = (currentNumber + amountToAdd) % (maxValue + 1);
+        
+        currentNumber = newCurrentNumber < 0 ? (maxValue + 1 + newCurrentNumber) : newCurrentNumber;
 
         numberText.text = currentNumber.ToString();
     }
